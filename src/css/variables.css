@@ -1,0 +1,8 @@
+:root {
+    font-family: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    --nav-height: 44px;
+    --container-width: 980px;
+}
