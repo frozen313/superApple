@@ -1,184 +1,167 @@
-/* src/css/navbar.css */
+:root {
+  --nav-height: 44px;
+  --nav-bg: rgba(251, 251, 253, 0.8);
+  --mask-bg: rgba(0, 0, 0, 0.4);
+  --anim-duration: 0.3s;
+}
+
+/* 全局重置 */
+ul, li { list-style: none; padding: 0; margin: 0; }
+a { text-decoration: none; color: inherit; cursor: pointer; }
+
+/* --- 导航栏容器 --- */
 .nav-container {
   position: fixed;
   top: 0;
+  left: 0;
   width: 100%;
   height: var(--nav-height);
   z-index: 999;
-  transition: background 0.3s;
+  
+  display: flex;
+  justify-content: center;
+  
+  background-color: var(--nav-bg);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  transition: background-color 0.3s ease;
 }
 
-/* JS 控制的状态类：当鼠标悬停时 */
-.nav-container.is-hovering {
-  background: white;
-  color: black;
+.nav-list {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 980px;
+  padding: 0 22px;
+  margin: 0;
+  height: 100%;
 }
 
-/* 默认下拉菜单是隐藏的 */
+.nav-item {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  position: static; /* 让内部绝对定位相对于 container */
+}
+
+.nav-link {
+  font-size: 12px;
+  color: #1d1d1f;
+  opacity: 0.8;
+  transition: opacity 0.3s;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+.nav-link:hover { opacity: 1; }
+
+/* --- 下拉菜单核心 (关键优化) --- */
 .nav-dropdown {
   position: absolute;
   top: var(--nav-height);
   left: 0;
   width: 100%;
-  background: white;
-  height: 0; /* 默认高度0 */
-  overflow: hidden;
-  transition: height 0.3s ease;
-  opacity: 0;
-}
-
-/* 当父级 li 被 hover 时显示下拉 (也可以用 JS 控制类名) */
-.nav-item:hover .nav-dropdown {
+  background: #fbfbfd;
+  color: #1d1d1f;
+  
   height: auto;
-  min-height: 300px;
-  opacity: 1;
-  padding: 20px 0;
-  border-bottom: 1px solid #ccc;
-}
-
-/* 遮罩层 */
-.page-mask {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(5px);
+  min-height: 200px;
+  padding: 40px 0 80px 0;
+  border-bottom: 1px solid #d2d2d7;
+  z-index: 1000;
+  
+  /* 默认隐藏状态 */
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s;
-  z-index: 900;
+  pointer-events: none;
+  
+  /* 默认带有向上位移（用于首次滑出） */
+  transform: translateY(-10px);
+  
+  /* 【关闭时】动画要快，且不要位移，防止重影 */
+  transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+  
+  /* 布局 */
+  display: flex;
+  justify-content: center;
 }
 
-.page-mask.is-visible {
+/* 激活状态 */
+.nav-dropdown.is-active {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+  
+  /* 【打开时】带有位移和透明度动画 */
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
-/* src/css/navbar.css */
-
-/* 1. 导航栏容器 */
-.nav-container {
-    /* 核心布局 */
-    display: flex;
-    justify-content: center; /* 内容居中 */
-    
-    /* 样式 */
-    background: rgba(0, 0, 0, 0.8); /* 半透明黑色背景 */
-    backdrop-filter: saturate(180%) blur(20px); /* 苹果经典的毛玻璃效果 */
-    height: 44px; /* 固定高度 */
-    width: 100%;
-    position: fixed; /* 固定在顶部 */
-    top: 0;
-    z-index: 9999;
+/* 
+   ★ 核心黑科技：解决切换时不流畅的问题
+   当导航栏背景已经是白色时（说明正在浏览菜单），
+   后续打开的菜单强制取消位移动画，只保留透明度渐变。
+*/
+.nav-container.is-hovering .nav-dropdown {
+    transform: none !important;
+}
+.nav-container.is-hovering .nav-dropdown.is-active {
+    transition: opacity 0.3s ease; /* 只有 fade-in */
 }
 
-/* 2. 列表容器 (ul) */
-.nav-list {
-    display: flex; /* 让 li 横向排列 */
-    justify-content: space-between; /* 两端对齐，中间留空 */
-    align-items: center; /* 垂直居中 */
-    
-    width: 100%;
-    max-width: 980px; /* 限制最大宽度，和苹果官网一致 */
-    padding: 0 22px; /* 左右留点边距 */
-    margin: 0;
-    height: 100%;
-}
 
-/* 3. 每一个导航项 (li) */
-.nav-item {
-    height: 100%; /* 撑满高度 */
-    display: flex;
-    align-items: center;
-}
-
-/* 4. 链接文字 (a) */
-.nav-link {
-    color: #f5f5f7; /* 苹果那种浅灰白 */
-    font-size: 12px;
-    text-decoration: none; /* 去掉下划线 */
-    opacity: 0.8;
-    transition: opacity 0.3s;
-    padding: 0 10px; /* 增加一点点击区域 */
-}
-
-/* 鼠标放上去变亮 */
-.nav-link:hover {
-    opacity: 1;
-}
-
-/* 下拉菜单容器 (隐身状态) */
-.nav-dropdown {
-    position: absolute; /* 绝对定位 */
-    top: 44px; /* 紧贴导航栏底部 */
-    left: 0;
-    width: 100vw; /* 视口宽度的 100% */
-    
-    background: #fbfbfd; /* 下拉菜单背景色（浅灰白） */
-    color: #1d1d1f; /* 文字深色 */
-    
-    height: 0; /* 默认高度 0，藏起来 */
-    overflow: hidden; /* 内容多了也不显示 */
-    visibility: hidden; /* 彻底隐藏 */
-    opacity: 0;
-    
-    /* 动画过渡：只过渡高度和透明度 */
-    transition: opacity 0.3s ease, visibility 0s linear 0.3s; 
-    
-    /* 让下拉菜单居中显示内容 */
-    display: flex;
-    justify-content: center;
-}
-
-/* 下拉菜单的内容区域 */
+/* --- 下拉内容排版 --- */
 .nav-dropdown-content {
-    width: 980px; /* 和导航栏一样宽 */
-    display: flex; /* 列与列横向排布 */
-    padding-top: 40px;
-    padding-bottom: 80px;
+  width: 100%;
+  max-width: 980px;
+  padding: 0 22px;
+  display: flex;
+  align-items: flex-start;
 }
 
-/* 每一列 */
-.nav-column {
-    margin-right: 40px; /* 列之间的间距 */
-}
-
-/* 列标题 (例如“选购”) */
+.nav-column { margin-right: 80px; }
 .nav-column h3 {
-    font-size: 12px;
-    color: #86868b;
-    margin-bottom: 10px;
-    font-weight: 400;
+  font-size: 12px;
+  color: #86868b;
+  margin-bottom: 15px;
+  font-weight: 400;
 }
-
-/* 列表项 */
 .nav-column ul li a {
-    display: block;
-    color: #1d1d1f;
-    font-size: 12px;
-    line-height: 2.2; /* 行高拉大一点 */
-    font-weight: 600;
+  display: block;
+  font-size: 12px;
+  line-height: 2.4;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+.nav-column ul li a:hover { color: #0066cc; }
+
+/* --- 遮罩层 --- */
+#blur-mask {
+  position: fixed;
+  top: var(--nav-height);
+  left: 0;
+  width: 100vw;
+  height: calc(100vh - var(--nav-height));
+  background-color: var(--mask-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 900;
+  
+  transition: opacity 0.3s ease, visibility 0s linear 0.3s;
 }
 
+#blur-mask.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 0.3s ease, visibility 0s linear 0s;
+}
 
-/* 当导航栏处于“激活”状态时（鼠标放上去） */
+/* 导航栏变白状态 */
 .nav-container.is-hovering {
-    background: #fbfbfd; /* 背景变白 */
-    color: #1d1d1f; /* 文字变黑 */
-}
-
-/* 当导航栏变白时，里面的链接也要变黑 */
-.nav-container.is-hovering .nav-link {
-    color: #1d1d1f;
-}
-
-/* 当鼠标悬停在具体的某个菜单项上时，显示它的下拉菜单 */
-.nav-item:hover .nav-dropdown {
-    height: auto; /* 高度自动撑开 */
-    min-height: 300px; /* 给个最小高度 */
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.3s ease; /* 只有透明度渐变 */
+  background: #fbfbfd;
 }

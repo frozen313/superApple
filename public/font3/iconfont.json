@@ -1,0 +1,16 @@
+{
+  "id": "",
+  "name": "",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "34523440",
+      "name": "闭合icon／购物袋",
+      "font_class": "a-biheicongouwudai",
+      "unicode": "e51e",
+      "unicode_decimal": 58654
+    }
+  ]
+}

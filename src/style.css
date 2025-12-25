@@ -1,5 +1,5 @@
 @import './css/variables.css';
-@import './css/reset.css'; /* 你可以去网上搜个简单的 reset css 填进去 */
+@import './css/reset.css';
 @import './css/navbar.css';
 
 body {
@@ -7,4 +7,7 @@ body {
   padding: 0;
   list-style: none;
   text-decoration: none;
-  box-sizing: border-box;}
+  box-sizing: border-box;
+  font-family: var(font-family);
+  -webkit-font-smoothing: antialiased;
+}
